@@ -13,7 +13,7 @@ from skimage.transform import rescale
 
 # Function to preprocess labels into 10-year bins
 def preprocess_labels(age):
-    label = int((age / 10) - 2)  # Group ages into 10-year bins
+    label = int((age / 20) - 1)  # Group ages into 10-year bins
     return label
 
 # Function to load images from directory
@@ -80,7 +80,7 @@ for train_index, test_index in skf.split(X, y):
     x = GlobalAveragePooling2D()(x)
 
     # Add Dense layer for classification (adjust the number of units according to your needs)
-    predictions = Dense(5, activation='softmax')(x)
+    predictions = Dense(2, activation='softmax')(x)
 
     # Combine base model and new layers
     model = Model(inputs=base_model.input, outputs=predictions)
@@ -92,7 +92,7 @@ for train_index, test_index in skf.split(X, y):
     # Compile model
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     # Train the model
-    model.fit(X_train, y_train, epochs=50, batch_size=32, verbose=1)
+    model.fit(X_train, y_train, epochs=30, batch_size=32, verbose=1)
 
     # Predict on test set
     y_pred_fold = np.argmax(model.predict(X_test), axis=1)
