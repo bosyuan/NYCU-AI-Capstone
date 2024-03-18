@@ -11,9 +11,9 @@ from skimage.transform import rotate
 from skimage.util import random_noise
 from skimage.transform import rescale
 
-# Function to preprocess labels into 10-year bins
+# Function to preprocess labels into year bins
 def preprocess_labels(age):
-    label = int((age / 20) - 1)  # Group ages into 10-year bins
+    label = int((age / 20) - 1)  # Group ages into year bins
     return label
 
 # Function to load images from directory
@@ -28,7 +28,7 @@ def load_images_from_dir(directory, augmentation=False):
         for filename in os.listdir(folder_path):
             if filename.endswith('.jpg') or filename.endswith('.png'):
                 img = cv2.imread(os.path.join(folder_path, filename))  # Load image with cv2
-                img = cv2.resize(img, (168, 224))  # Resize image to 120 x 160 with cv2
+                img = cv2.resize(img, (168, 224))  # Resize image to 168 x 224 with cv2
                 images.append(img)
                 labels.append(label)  # Use preprocessed label
 
@@ -57,11 +57,11 @@ def load_images_from_dir(directory, augmentation=False):
                 
     return np.array(images), np.array(labels)
 
-# Load images from your dataset directory
+# Load images from dataset directory
 dataset_dir = 'dataset'
 X, y = load_images_from_dir(dataset_dir)
 
-# Initialize variables for cross-validation
+# Initialize variables for cross-validation, n_split is the number of folds
 skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 y_pred = []
 y_true = []
@@ -86,8 +86,8 @@ for train_index, test_index in skf.split(X, y):
     model = Model(inputs=base_model.input, outputs=predictions)
 
     # Freeze pre-trained layers
-    # for layer in base_model.layers:
-    #     layer.trainable = False
+    for layer in base_model.layers:
+        layer.trainable = False
 
     # Compile model
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])

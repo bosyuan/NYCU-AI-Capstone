@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from matplotlib.pyplot import show
 from skimage.transform import rotate
+from sklearn.metrics import adjusted_rand_score
 from skimage.util import random_noise
 from skimage.transform import rescale
 
@@ -58,23 +59,23 @@ def load_images_from_dir(directory, augmentation=False):
 
 # Load images from your dataset directory
 dataset_dir = 'dataset'
-X, y = load_images_from_dir(dataset_dir, augmentation=True)
+X, y = load_images_from_dir(dataset_dir)
 
 # Flatten the images
 X_flat = X.reshape(X.shape[0], -1)
 
 # Perform PCA
-pca = PCA(n_components=30)  # Adjust the number of components as needed
+pca = PCA(n_components=31)  # Adjust the number of components as needed
 X_pca = pca.fit_transform(X_flat)
 
 # Initialize KMeans model
 kmeans = KMeans(n_clusters=4, random_state=4, n_init=10, max_iter=300, tol=1e-04)
 
 # Fit KMeans model
-kmeans.fit(X_pca)
+kmeans.fit(X_flat)
 
 # Predict clusters
-y_pred = kmeans.predict(X_pca)
+y_pred = kmeans.predict(X_flat)
 
 # Calculate confusion matrix
 conf_matrix = confusion_matrix(y, y_pred)
@@ -92,4 +93,7 @@ show()
 accuracy = np.trace(conf_matrix) / np.sum(conf_matrix)
 
 print("Accuracy:", accuracy)
+
+ari_score = adjusted_rand_score(y, y_pred)
+print("Adjusted Rand Index (ARI):", ari_score)
 
